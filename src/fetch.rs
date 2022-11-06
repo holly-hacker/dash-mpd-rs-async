@@ -41,7 +41,7 @@ fn tmp_file_path(prefix: &str) -> Result<String, DashMpdError> {
 
 /// Receives updates concerning the progression of the download, and can display this information to
 /// the user, for example using a progress bar.
-pub trait ProgressObserver {
+pub trait ProgressObserver: Send + Sync {
     fn update(&self, percent: u32, message: &str);
 }
 

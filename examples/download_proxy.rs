@@ -23,7 +23,8 @@ use reqwest::header;
 use dash_mpd::fetch::DashDownloader;
 
 
-fn main () {
+#[tokio::main]
+async fn main () {
     env_logger::Builder::from_env(Env::default().default_filter_or("info,reqwest=warn")).init();
     let mut headers = header::HeaderMap::new();
     headers.insert("X-MY-HEADER",  header::HeaderValue::from_static("foo"));
@@ -34,7 +35,7 @@ fn main () {
                    .unwrap_or("socks5://127.0.0.1:9050".to_string()));
     let proxy = reqwest::Proxy::http(http_proxy)
         .expect("connecting to HTTP proxy");
-    let client = reqwest::blocking::Client::builder()
+    let client = reqwest::Client::builder()
         .proxy(proxy)
         .user_agent("Mozilla/5.0")
         .default_headers(headers)
@@ -47,7 +48,7 @@ fn main () {
     match DashDownloader::new(url)
         .with_http_client(client)
         .worst_quality()
-        .download_to(out) {
+        .download_to(out).await {
 	Err(e) => {
           eprintln!("Download failed: {:?}", e);
           process::exit(-1);
